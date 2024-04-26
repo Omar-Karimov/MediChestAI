@@ -86,7 +86,7 @@ class ConfigurationManager:
         eval_config = EvaluationConfig(
             path_of_model="artifacts/training/model.h5",
             training_data="artifacts/data_ingestion/dataset_chest",
-            mlflow_uri=MLFLOW_URI,
+            mlflow_uri="https://dagshub.com/Omar-Karimov/MediChestAI.mlflow",
             all_params=self.params,
             params_image_size=self.params.IMAGE_SIZE,
             params_batch_size=self.params.BATCH_SIZE
