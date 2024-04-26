@@ -1,9 +1,11 @@
+
 import os
 from CNNClassifier.constants import *
 from CNNClassifier.utils.common import read_yaml, create_directories
 from CNNClassifier.entity.config_entity import (DataIngestionConfig,
                                                 PrepareBaseModelConfig,
-                                                TrainingConfig)
+                                                TrainingConfig,
+                                                EvaluationConfig)
 
 
 class ConfigurationManager:
@@ -60,7 +62,7 @@ class ConfigurationManager:
         training = self.config.training
         prepare_base_model = self.config.prepare_base_model
         params = self.params
-        training_data = os.path.join(self.config.data_ingestion.unzip_dir, "dataset_chest")
+        training_data = os.path.join(self.config.data_ingestion.unzip_dir, "Chest-CT-Scan-data")
         create_directories([
             Path(training.root_dir)
         ])
@@ -77,3 +79,16 @@ class ConfigurationManager:
         )
 
         return training_config
+    
+
+
+    def get_evaluation_config(self) -> EvaluationConfig:
+        eval_config = EvaluationConfig(
+            path_of_model="artifacts/training/model.h5",
+            training_data="artifacts/data_ingestion/dataset_chest",
+            mlflow_uri=MLFLOW_URI,
+            all_params=self.params,
+            params_image_size=self.params.IMAGE_SIZE,
+            params_batch_size=self.params.BATCH_SIZE
+        )
+        return eval_config
