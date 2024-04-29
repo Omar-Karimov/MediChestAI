@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediChestAI</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body { background-color: #f8f9fa; }
+        .border-custom { border-color: #007bff !important; }
+        .image-container { position: relative; width: 100%; padding-top: 100%; /* 1:1 Aspect Ratio */ }
+        .image-container img, .image-container video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+        .loader { display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .loader div { width: 3rem; height: 3rem; border: 0.4em solid transparent; border-top-color: #007bff; border-radius: 50%; animation: spin 2s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .result-success { color: green; }
+        .result-danger { color: red; }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <h1 class="text-center mb-4">MediChestAI APP</h1>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="image-container">
+                            <video id="video" autoplay controls></video>
+                            <img id="photo" src="" alt="Uploaded Image" style="display: none;">
+                        </div>
+                        <div class="mt-3 text-center">
+                            <input type="file" id="fileinput" class="form-control-file" hidden>
+                            <button class="btn btn-primary mr-2" onclick="document.getElementById('fileinput').click();">Upload</button>
+                            <button class="btn btn-success" id="send">Predict</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Prediction Results</h5>
+                        <div class="res-part border-custom" style="height: 300px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loading" style="display: none;">
+        <div class="loader"><div></div></div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#fileinput').change(function(event) {
+                if (this.files && this.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#photo').attr('src', e.target.result).show();
+                        $('#video').hide();
+                    };
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+
+            $('#send').click(function() {
+                var base64Data = $('#photo').attr('src').replace(/^data:image\/(png|jpeg);base64,/, "");
+                sendRequest(base64Data);
+            });
+
+            function sendRequest(base64Data) {
+                var url = '../predict'; // Adjust as necessary
+                $("#loading").show();
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({ image: base64Data }),
+                    success: function(res) {
+                        var prediction = res[0].image;
+                        var resultText = JSON.stringify(res, undefined, 2);
+                        $(".res-part").html("<pre>" + resultText + "</pre>");
+                        if (prediction === "Normal") {
+                            $(".res-part").removeClass("result-danger").addClass("result-success");
+                        } else if (prediction === "Adenocarcinoma Cancer") {
+                            $(".res-part").removeClass("result-success").addClass("result-danger");
+                        }
+                        $("#loading").hide();
+                    },
+                    error: function() {
+                        $(".res-part").html("<div class='alert alert-danger'>Error processing request.</div>");
+                        $("#loading").hide();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
