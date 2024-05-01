@@ -1,26 +1,13 @@
 name: Trigger Jenkins Job
 
 on:
-  # Trigger the workflow on push events to the main branch or manual dispatch.
-  push:
-    branches:
-      - main
   workflow_dispatch:
-
+    
 jobs:
   trigger:
-    name: Trigger Jenkins Build
+    name: Build
     runs-on: ubuntu-latest
-
     steps:
-      # Debugging: Check if secrets are correctly passed.
-      - name: Debug Secrets
-        run: |
-          echo "Jenkins URL: ${{ secrets.URL }}"
-          echo "Jenkins User: ${{ secrets.USER }}"
-          echo "Jenkins Job: ${{ secrets.JOBS }}"
-
-      # Actual Jenkins trigger step
       - name: Trigger Jenkins Job
         uses: appleboy/jenkins-action@master
         with:
@@ -28,4 +15,3 @@ jobs:
           user: ${{ secrets.USER }}
           token: ${{ secrets.TOKEN }}
           job: ${{ secrets.JOBS }}
-          debug: true # Enable debugging information
