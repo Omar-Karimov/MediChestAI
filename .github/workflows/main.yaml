@@ -1,8 +1,7 @@
 name: Trigger Jenkins Job
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
     
 jobs:
   trigger:
@@ -16,4 +15,3 @@ jobs:
           user: ${{ secrets.USER }}
           token: ${{ secrets.TOKEN }}
           job: ${{ secrets.JOBS }}
-          
