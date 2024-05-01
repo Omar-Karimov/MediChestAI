@@ -22,7 +22,7 @@ jobs:
 
       # Actual Jenkins trigger step
       - name: Trigger Jenkins Job
-        uses: appleboy/jenkins-action@v0.1.0 # Adjust the version if needed
+        uses: appleboy/jenkins-action@master
         with:
           url: ${{ secrets.URL }}
           user: ${{ secrets.USER }}
